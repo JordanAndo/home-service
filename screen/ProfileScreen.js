@@ -33,7 +33,7 @@ const ProfileScreen = () => {
       <View style={styles.header}>
         <TouchableOpacity onPress={pickImage}>
           <Image
-            source={image ? { uri: image } : require('../assets/image/cleaning1.png')}
+            source={image ? { uri: image } : require('../assets/image/Slider1.png')}
             style={styles.profileImage}
           />
         </TouchableOpacity>

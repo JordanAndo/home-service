@@ -5,26 +5,26 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../Firebase/firebaseConfig';
 import { collection, getDocs } from "firebase/firestore";
 
-import painting1 from '../assets/image/painting1.png';
-import painting2 from '../assets/image/painting2.png';
-import work1 from '../assets/image/work1.png';
-import work2 from '../assets/image/work2.png';
-import work3 from '../assets/image/work3.png';
-import work4 from '../assets/image/work4.png';
+// import plumbing1 from '../assets/image/plumbing1.png';
+// import plumbing2 from '../assets/image/plumbing2.png';
+// import workp1 from '../assets/image/workp1.png';
+// import workp2 from '../assets/image/workp2.png';
+// import workp3 from '../assets/image/workp3.png';
+// import workp4 from '../assets/image/workp4.png';
 
 // Mapping of image file names to imported image assets
 const imageMap = {
-  'painting1.png': painting1,
-  'painting2.png': painting2,
-  'work1.png': work1,
-  'work2.png': work2,
-  'work3.png': work3,
-  'work4.png': work4
+  // 'plumbing1.png': plumbing1,
+  // 'plumbing2.png': plumbing2,
+  // 'workp1.png': workp1,
+  // 'workp2.png': workp2,
+  // 'workp3.png': workp3,
+  // 'workp4.png': workp4
   
   // Add mapping for any other images used in relatedImages
 };
 
-const PaintingService = () => {
+const paintingService= () => {
   const [services, setServices] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -33,7 +33,7 @@ const PaintingService = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const serviceSnapshot = await getDocs(collection(db, 'painting'));
+        const serviceSnapshot = await getDocs(collection(db, 'plumbing'));
         const servicesList = serviceSnapshot.docs.map(doc => {
           const data = doc.data();
           const imageName = data.image ? data.image.split('/').pop() : null;
@@ -243,9 +243,7 @@ const styles = StyleSheet.create({
   bookNowButton: {
     backgroundColor: 'purple',
   },
-  reviewButton: {
-    backgroundColor: 'green',
-  },
+ 
   buttonText: {
     color: 'white',
     textAlign: 'center',
@@ -271,4 +269,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PaintingService;
+export default paintingService;

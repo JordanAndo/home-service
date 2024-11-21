@@ -5,16 +5,16 @@ import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const imageMap = {
-  'qEgiKTovsn6OwWMbhtV3': require('../assets/image/cleaning1.png'),
-  'xMzhyDPCzuq7CnexMl74': require('../assets/image/cleaning2.png'),
-  'nkVtiuVIondPpMuiUK8U': require('../assets/image/cleaning3.png'),
-  'ZVvmlqUcKZlpi85IeC33': require('../assets/image/cleaning4.png'),
-  '4oTtspwW2lHmok9krCoW': require('../assets/image/repairing1.png'),
-  'R1D9hJweATK1ltjzrqbc': require('../assets/image/repairing2.png'),
-  '37IiCBqNddOZGRiNI09J': require('../assets/image/painting1.png'),
-  'VeecBj9llRRgnGCTJsX3': require('../assets/image/painting2.png'),
-  'XdxL8pbYHirCUuxC4Ye3': require('../assets/image/plumbing1.png'),
-  'GuK5yrUOKnqpBhS8Pw3Z': require('../assets/image/plumbing2.png'),
+  // 'qEgiKTovsn6OwWMbhtV3': require('../assets/image/cleaning1.png'),
+  // 'xMzhyDPCzuq7CnexMl74': require('../assets/image/cleaning2.png'),
+  // 'nkVtiuVIondPpMuiUK8U': require('../assets/image/cleaning3.png'),
+  // 'ZVvmlqUcKZlpi85IeC33': require('../assets/image/cleaning4.png'),
+  // '4oTtspwW2lHmok9krCoW': require('../assets/image/repairing1.png'),
+  // 'R1D9hJweATK1ltjzrqbc': require('../assets/image/repairing2.png'),
+  // '37IiCBqNddOZGRiNI09J': require('../assets/image/painting1.png'),
+  // 'VeecBj9llRRgnGCTJsX3': require('../assets/image/painting2.png'),
+  // 'XdxL8pbYHirCUuxC4Ye3': require('../assets/image/plumbing1.png'),
+  // 'GuK5yrUOKnqpBhS8Pw3Z': require('../assets/image/plumbing2.png'),
   // Your image mapping here
 };
 

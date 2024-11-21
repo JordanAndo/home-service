@@ -5,20 +5,22 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../Firebase/firebaseConfig';
 import { collection, getDocs } from "firebase/firestore";
 
-import plumbing1 from '../assets/image/plumbing1.png';
-import plumbing2 from '../assets/image/plumbing2.png';
-import workp1 from '../assets/image/workp1.png';
-import workp2 from '../assets/image/workp2.png';
-import workp3 from '../assets/image/workp3.png';
-import workp4 from '../assets/image/workp4.png';
+// import plumbing1 from '../assets/image/plumbing1.png';
+// import plumbing2 from '../assets/image/plumbing2.png';
+// import workp1 from '../assets/image/workp1.png';
+// import workp2 from '../assets/image/workp2.png';
+// import workp3 from '../assets/image/workp3.png';
+// import workp4 from '../assets/image/workp4.png';
+
 // Mapping of image file names to imported image assets
 const imageMap = {
-  'plumbing1.png': plumbing1,
-  'plumbing2.png': plumbing2,
-  'workp1.png': workp1,
-  'workp2.png': workp2,
-  'workp3.png': workp3,
-  'workp4.png': workp4
+  // 'plumbing1.png': plumbing1,
+  // 'plumbing2.png': plumbing2,
+  // 'workp1.png': workp1,
+  // 'workp2.png': workp2,
+  // 'workp3.png': workp3,
+  // 'workp4.png': workp4
+ 
   
   // Add mapping for any other images used in relatedImages
 };

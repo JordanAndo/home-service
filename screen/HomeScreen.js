@@ -29,9 +29,9 @@ const HomeScreen = () => {
   ];
 
   const popularServicesData = [
-    { id: '1', title: 'Floor Cleaning', image: require('../assets/image/cleaning1.png'), screen: 'Cleaning Service' },
-    { id: '2', title: 'Room Cleaning', image: require('../assets/image/cleaning2.png'), screen: 'Cleaning Service' },
-    { id: '3', title: 'Bathroom Cleaning', image: require('../assets/image/cleaning4.png'), screen: 'Cleaning Service' },
+    { id: '1', title: 'Floor Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
+    { id: '2', title: 'Room Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
+    { id: '3', title: 'Bathroom Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
   ];
 
   const categoriesData = [

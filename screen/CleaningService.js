@@ -5,28 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../Firebase/firebaseConfig';
 import { collection, getDocs } from "firebase/firestore";
 
-import cleaning1 from '../assets/image/cleaning1.png';
-import cleaning2 from '../assets/image/cleaning2.png';
-import cleaning3 from '../assets/image/cleaning3.png';
-import cleaning4 from '../assets/image/cleaning4.png';
-import work1 from '../assets/image/work1.png';
-import work2 from '../assets/image/work2.png';
-import work3 from '../assets/image/work3.png';
-import work4 from '../assets/image/work4.png';
-
-// Mapping of image file names to imported image assets
-const imageMap = {
-  'cleaning1.png': cleaning1,
-  'cleaning2.png': cleaning2,
-  'cleaning3.png': cleaning3,
-  'cleaning4.png': cleaning4,
-  'work1.png': work1,
-  'work2.png': work2,
-  'work3.png': work3,
-  'work4.png': work4
-  // Add mapping for any other images used in relatedImages
-};
-
 const CleaningService = () => {
   const [services, setServices] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -39,12 +17,10 @@ const CleaningService = () => {
         const serviceSnapshot = await getDocs(collection(db, 'cleaning'));
         const servicesList = serviceSnapshot.docs.map(doc => {
           const data = doc.data();
-          const imageName = data.image ? data.image.split('/').pop() : null;
-
           return {
             id: doc.id,
             ...data,
-            image: imageMap[imageName] || null,
+            image: data.image || null,  // Image URL directly from Firestore
             relatedImages: data.relatedImages || [], // Fetch relatedImages array
           };
         });
@@ -65,7 +41,7 @@ const CleaningService = () => {
         setModalVisible(true);
       }}
     >
-      <Image source={item.image} style={styles.image} />
+      {item.image && <Image source={{ uri: item.image }} style={styles.image} />}
       <View style={styles.details}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.amount}>${item.amount}</Text>
@@ -79,7 +55,7 @@ const CleaningService = () => {
 
   const renderRelatedService = ({ item }) => (
     <TouchableOpacity style={styles.relatedServiceContainer}>
-      <Image source={imageMap[item]} style={styles.relatedImage} />
+      {item && <Image source={{ uri: item }} style={styles.relatedImage} />}
     </TouchableOpacity>
   );
 
@@ -104,7 +80,7 @@ const CleaningService = () => {
           <Text style={styles.header}>Service Details</Text>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Image source={selectedItem.image} style={styles.fullImage} />
+              {selectedItem.image && <Image source={{ uri: selectedItem.image }} style={styles.fullImage} />}
               <Text style={styles.subName}>{selectedItem.name}</Text>
               <Text style={styles.name}>Rs.{selectedItem.amount}</Text>
               <View style={styles.locationContainer}>
@@ -124,16 +100,14 @@ const CleaningService = () => {
                 >
                   <Text style={styles.buttonText}>Book Now</Text>
                 </TouchableOpacity>
-
-                
               </View>
 
               {/* Related Services Section */}
               <Text style={styles.relatedHeader}>Related Services</Text>
               <FlatList
-                data={selectedItem.relatedImages.map(image => image.split('/').pop())} // Use only the file name for mapping
+                data={selectedItem.relatedImages} // Directly use the image URLs
                 renderItem={renderRelatedService}
-                keyExtractor={(item, index) => index.toString()} // Use index as key
+                keyExtractor={(item, index) => index.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.relatedServicesList}
@@ -168,7 +142,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: 'center',
     elevation: 2,
-    
   },
   image: {
     width: 80,
@@ -205,7 +178,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
-    marginTop: -50
+    marginTop: -50,
   },
   modalContent: {
     flex: 1,
@@ -247,7 +220,6 @@ const styles = StyleSheet.create({
   bookNowButton: {
     backgroundColor: 'purple',
   },
- 
   buttonText: {
     color: 'white',
     textAlign: 'center',
