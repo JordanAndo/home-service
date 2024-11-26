@@ -23,7 +23,7 @@ const Stack = createStackNavigator();
 const HomeStackNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Homemain" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Home" component={HomeScreen}  />
       <Stack.Screen name="Cleaning Service" component={CleaningService} />
       <Stack.Screen name="Repairing Service" component={RepairingService} />
       <Stack.Screen name="Plumbing Service" component={PlumbingService} />

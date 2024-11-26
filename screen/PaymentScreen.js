@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert, ScrollView, TouchableOpacity, Modal, Tex
 import { db, auth } from '../Firebase/firebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import RadioButtonRN from 'radio-buttons-react-native';
-import StarRating from 'react-native-star-rating-widget'; // Import star rating library
+// import StarRating from 'react-native-star-rating-widget'; // Commented for testing purposes
 
 export default function PaymentScreen({ route, navigation }) {
   const { selectedDate, selectedTime, selectedItem } = route.params;
@@ -18,7 +18,7 @@ export default function PaymentScreen({ route, navigation }) {
 
   const paymentOptions = [
     { label: 'GPay' },
-    { label: 'Cash on ' }
+    { label: 'Cash on Delivery' }
   ];
 
   useEffect(() => {
@@ -42,6 +42,7 @@ export default function PaymentScreen({ route, navigation }) {
         }
       } catch (error) {
         Alert.alert("Error", "Error fetching service details. Please try again.");
+        console.error("Error fetching service details:", error);
       }
     };
 
@@ -59,6 +60,11 @@ export default function PaymentScreen({ route, navigation }) {
     const serviceAmount = parseFloat(serviceDetails.amount);
     const gstAmount = serviceAmount * GST_PERCENTAGE;
     const totalAmount = serviceAmount + gstAmount;
+
+    if (!selectedPaymentMethod) {
+      Alert.alert("Error", "Please select a payment method.");
+      return;
+    }
 
     const paymentData = {
       serviceId: selectedItem.id,
@@ -80,6 +86,7 @@ export default function PaymentScreen({ route, navigation }) {
       setModalVisible(true); // Open the review modal after payment confirmation
     } catch (error) {
       Alert.alert("Error", "Error saving payment details. Please try again.");
+      console.error("Error saving payment details:", error);
     }
   };
 
@@ -145,12 +152,13 @@ export default function PaymentScreen({ route, navigation }) {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalHeader}>Leave a Review</Text>
-            <StarRating
+            {/* Uncomment this section if StarRating is confirmed not to cause issues */}
+            {/* <StarRating
               rating={rating}
               onChange={setRating}
               starStyle={{ padding: 10 }}
               starSize={30}
-            />
+            /> */}
             <TextInput
               style={styles.reviewInput}
               placeholder="Write your review..."

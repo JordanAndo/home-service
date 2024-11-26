@@ -48,8 +48,11 @@ export default function DateTimePickerScreen({ route, navigation }) {
     try {
       await setDoc(doc(db, 'bookings', bookingId), bookingData);
       ToastAndroid.show('Booking confirmed successfully!', ToastAndroid.LONG);
-      
-      navigation.navigate('Home'); // Change to 'Home' screen after confirmation
+
+      // Add delay for navigation to ensure Firestore operation is completed
+      setTimeout(() => {
+        navigation.navigate('Home'); // Navigate after booking confirmation
+      }, 1000); // 1-second delay
     } catch (error) {
       console.error("Error saving booking: ", error);
       ToastAndroid.show('Error confirming booking. Please try again.', ToastAndroid.LONG);

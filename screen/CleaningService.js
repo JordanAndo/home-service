@@ -17,10 +17,11 @@ const CleaningService = () => {
         const serviceSnapshot = await getDocs(collection(db, 'cleaning'));
         const servicesList = serviceSnapshot.docs.map(doc => {
           const data = doc.data();
+          console.log("Service Data:", data); // Debugging: Check what data is being fetched
           return {
             id: doc.id,
             ...data,
-            image: data.image || null,  // Image URL directly from Firestore
+            image: data.image || null,  // Ensure image URL is properly assigned
             relatedImages: data.relatedImages || [], // Fetch relatedImages array
           };
         });
@@ -41,7 +42,11 @@ const CleaningService = () => {
         setModalVisible(true);
       }}
     >
-      {item.image && <Image source={{ uri: item.image }} style={styles.image} />}
+      {item.image ? (
+        <Image source={{ uri: item.image }} style={styles.image} />
+      ) : (
+        <Text style={styles.noImageText}>No Image Available</Text>
+      )}
       <View style={styles.details}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.amount}>${item.amount}</Text>
@@ -55,11 +60,14 @@ const CleaningService = () => {
 
   const renderRelatedService = ({ item }) => (
     <TouchableOpacity style={styles.relatedServiceContainer}>
-      {item && <Image source={{ uri: item }} style={styles.relatedImage} />}
+      {item ? (
+        <Image source={{ uri: item }} style={styles.relatedImage} />
+      ) : (
+        <Text style={styles.noImageText}>No Related Image</Text>
+      )}
     </TouchableOpacity>
   );
-
-  return (
+return (
     <View style={styles.container}>
       <FlatList
         data={services}
@@ -80,11 +88,15 @@ const CleaningService = () => {
           <Text style={styles.header}>Service Details</Text>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              {selectedItem.image && <Image source={{ uri: selectedItem.image }} style={styles.fullImage} />}
+              {selectedItem.image ? (
+                <Image source={{ uri: selectedItem.image }} style={styles.fullImage} />
+              ) : (
+                <Text style={styles.noImageText}>No Image Available</Text>
+              )}
               <Text style={styles.subName}>{selectedItem.name}</Text>
               <Text style={styles.name}>Rs.{selectedItem.amount}</Text>
               <View style={styles.locationContainer}>
-              <Icon name="location-pin" size={20} color="purple" />
+                <Icon name="location-pin" size={20} color="purple" />
                 <Text style={styles.location}>{selectedItem.location}</Text>
               </View>
               <Text style={styles.aboutTitle}>Description</Text>
@@ -92,7 +104,7 @@ const CleaningService = () => {
                 Lorem Ipsum is simply dummy text of the printing and typesetting industry.
               </Text>
 
-              {/* Button Container with Book Now and Review */}
+              {/* Button Container with Book Now */}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[styles.button, styles.bookNowButton]}
@@ -105,7 +117,7 @@ const CleaningService = () => {
               {/* Related Services Section */}
               <Text style={styles.relatedHeader}>Related Services</Text>
               <FlatList
-                data={selectedItem.relatedImages} // Directly use the image URLs
+                data={selectedItem.relatedImages}
                 renderItem={renderRelatedService}
                 keyExtractor={(item, index) => index.toString()}
                 horizontal
@@ -119,6 +131,7 @@ const CleaningService = () => {
     </View>
   );
 };
+
 
 // Styles for the component
 const styles = StyleSheet.create({

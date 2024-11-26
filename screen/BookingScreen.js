@@ -4,30 +4,58 @@ import { db, auth } from '../Firebase/firebaseConfig';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const imageMap = {
-  // 'qEgiKTovsn6OwWMbhtV3': require('../assets/image/cleaning1.png'),
-  // 'xMzhyDPCzuq7CnexMl74': require('../assets/image/cleaning2.png'),
-  // 'nkVtiuVIondPpMuiUK8U': require('../assets/image/cleaning3.png'),
-  // 'ZVvmlqUcKZlpi85IeC33': require('../assets/image/cleaning4.png'),
-  // '4oTtspwW2lHmok9krCoW': require('../assets/image/repairing1.png'),
-  // 'R1D9hJweATK1ltjzrqbc': require('../assets/image/repairing2.png'),
-  // '37IiCBqNddOZGRiNI09J': require('../assets/image/painting1.png'),
-  // 'VeecBj9llRRgnGCTJsX3': require('../assets/image/painting2.png'),
-  // 'XdxL8pbYHirCUuxC4Ye3': require('../assets/image/plumbing1.png'),
-  // 'GuK5yrUOKnqpBhS8Pw3Z': require('../assets/image/plumbing2.png'),
-  // Your image mapping here
-};
-
 export default function BookingScreen({ navigation }) {
   const [bookings, setBookings] = useState([]);
+  const [services, setServices] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
- 
-
-  // New state to track payment button presses
   const [paymentPressed, setPaymentPressed] = useState({});
 
+  // Fetch services to map the serviceId to the image
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        // Fetch cleaning services
+        const cleaningSnapshot = await getDocs(collection(db, 'cleaning'));
+        const cleaningList = cleaningSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, ...data, image: data.image || null };
+        });
+
+        // Fetch plumbing services
+        const plumbingSnapshot = await getDocs(collection(db, 'plumbing'));
+        const plumbingList = plumbingSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, ...data, image: data.image || null };
+        });
+
+        // Fetch repairing services
+        const repairingSnapshot = await getDocs(collection(db, 'repairing'));
+        const repairingList = repairingSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, ...data, image: data.image || null };
+        });
+
+        // Fetch painting services
+        const paintingSnapshot = await getDocs(collection(db, 'painting'));
+        const paintingList = paintingSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, ...data, image: data.image || null };
+        });
+
+        // Combine all service lists into one
+        const allServices = [...cleaningList, ...plumbingList, ...repairingList, ...paintingList];
+        setServices(allServices);
+
+      } catch (error) {
+        console.error("Error fetching services: ", error);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  // Fetch bookings
   const fetchBookings = async () => {
     if (!auth.currentUser) return;
 
@@ -86,6 +114,10 @@ export default function BookingScreen({ navigation }) {
   };
 
   const renderBooking = ({ item }) => {
+    // Find the corresponding service
+    const service = services.find(service => service.id === item.serviceId);
+    const serviceImage = service ? service.image : '';
+
     let displayStatus = item.status;
     let statusStyle = styles.statusButton;
 
@@ -105,33 +137,31 @@ export default function BookingScreen({ navigation }) {
 
     return (
       <View style={styles.bookingContainer}>
-        <Image
-          source={imageMap[item.serviceId] || { uri: 'https://via.placeholder.com/80' }}
-          style={styles.image}
-        />
+        {serviceImage ? (
+          <Image source={{ uri: serviceImage }} style={styles.image} />
+        ) : (
+          <Text>No Service Image Available</Text>
+        )}
         <View style={styles.details}>
           <Text style={styles.name}>{item.serviceName}</Text>
           <Text style={styles.amount}>Selected Date: {item.selectedDate}</Text>
 
-          {/* Status Button */}
           <TouchableOpacity style={[styles.statusButton, statusStyle]}>
             <Text style={styles.statusButtonText}>{displayStatus}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Ellipsis icon in the right corner with delete option */}
         <TouchableOpacity style={styles.ellipsisButton} onPress={() => showDeleteOption(item.id)}>
           <Icon name="ellipsis-vertical" size={24} color="black" />
         </TouchableOpacity>
 
-        {/* Payment Button - Show only if status is Completed and not pressed */}
         {item.status === 'Completed' && !paymentPressed[item.id] && (
-          <TouchableOpacity 
-            style={styles.paymentButton} 
+          <TouchableOpacity
+            style={styles.paymentButton}
             onPress={() => {
-              setPaymentPressed(prev => ({ ...prev, [item.id]: true })); // Mark payment button as pressed
+              setPaymentPressed(prev => ({ ...prev, [item.id]: true }));
               navigation.navigate('Payment', {
-                selectedDate: item.selectedDate, // Ensure this field exists in your data
+                selectedDate: item.selectedDate,
                 selectedTime: item.selectedTime,
                 selectedItem: { id: item.serviceId, name: item.serviceName }
               });
@@ -156,18 +186,6 @@ export default function BookingScreen({ navigation }) {
       ) : (
         <Text>No bookings available.</Text>
       )}
-
-      {/* Modal for Review */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          {/* Your modal content can go here */}
-        </View>
-      </Modal>
     </View>
   );
 }

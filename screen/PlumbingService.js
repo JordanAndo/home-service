@@ -5,26 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { db } from '../Firebase/firebaseConfig';
 import { collection, getDocs } from "firebase/firestore";
 
-// import plumbing1 from '../assets/image/plumbing1.png';
-// import plumbing2 from '../assets/image/plumbing2.png';
-// import workp1 from '../assets/image/workp1.png';
-// import workp2 from '../assets/image/workp2.png';
-// import workp3 from '../assets/image/workp3.png';
-// import workp4 from '../assets/image/workp4.png';
-
-// Mapping of image file names to imported image assets
-const imageMap = {
-  // 'plumbing1.png': plumbing1,
-  // 'plumbing2.png': plumbing2,
-  // 'workp1.png': workp1,
-  // 'workp2.png': workp2,
-  // 'workp3.png': workp3,
-  // 'workp4.png': workp4
- 
-  
-  // Add mapping for any other images used in relatedImages
-};
-
 const PlumbingService = () => {
   const [services, setServices] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,12 +17,11 @@ const PlumbingService = () => {
         const serviceSnapshot = await getDocs(collection(db, 'plumbing'));
         const servicesList = serviceSnapshot.docs.map(doc => {
           const data = doc.data();
-          const imageName = data.image ? data.image.split('/').pop() : null;
-
+          console.log("Service Data:", data); // Debugging: Check what data is being fetched
           return {
             id: doc.id,
             ...data,
-            image: imageMap[imageName] || null,
+            image: data.image || null,  // Ensure image URL is properly assigned
             relatedImages: data.relatedImages || [], // Fetch relatedImages array
           };
         });
@@ -63,7 +42,11 @@ const PlumbingService = () => {
         setModalVisible(true);
       }}
     >
-      <Image source={item.image} style={styles.image} />
+      {item.image ? (
+        <Image source={{ uri: item.image }} style={styles.image} />
+      ) : (
+        <Text style={styles.noImageText}>No Image Available</Text>
+      )}
       <View style={styles.details}>
         <Text style={styles.name}>{item.name}</Text>
         <Text style={styles.amount}>${item.amount}</Text>
@@ -77,11 +60,14 @@ const PlumbingService = () => {
 
   const renderRelatedService = ({ item }) => (
     <TouchableOpacity style={styles.relatedServiceContainer}>
-      <Image source={imageMap[item]} style={styles.relatedImage} />
+      {item ? (
+        <Image source={{ uri: item }} style={styles.relatedImage} />
+      ) : (
+        <Text style={styles.noImageText}>No Related Image</Text>
+      )}
     </TouchableOpacity>
   );
-
-  return (
+return (
     <View style={styles.container}>
       <FlatList
         data={services}
@@ -102,7 +88,11 @@ const PlumbingService = () => {
           <Text style={styles.header}>Service Details</Text>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Image source={selectedItem.image} style={styles.fullImage} />
+              {selectedItem.image ? (
+                <Image source={{ uri: selectedItem.image }} style={styles.fullImage} />
+              ) : (
+                <Text style={styles.noImageText}>No Image Available</Text>
+              )}
               <Text style={styles.subName}>{selectedItem.name}</Text>
               <Text style={styles.name}>Rs.{selectedItem.amount}</Text>
               <View style={styles.locationContainer}>
@@ -114,7 +104,7 @@ const PlumbingService = () => {
                 Lorem Ipsum is simply dummy text of the printing and typesetting industry.
               </Text>
 
-              {/* Button Container with Book Now and Review */}
+              {/* Button Container with Book Now */}
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
                   style={[styles.button, styles.bookNowButton]}
@@ -122,16 +112,14 @@ const PlumbingService = () => {
                 >
                   <Text style={styles.buttonText}>Book Now</Text>
                 </TouchableOpacity>
-
-                
               </View>
 
               {/* Related Services Section */}
               <Text style={styles.relatedHeader}>Related Services</Text>
               <FlatList
-                data={selectedItem.relatedImages.map(image => image.split('/').pop())} // Use only the file name for mapping
+                data={selectedItem.relatedImages}
                 renderItem={renderRelatedService}
-                keyExtractor={(item, index) => index.toString()} // Use index as key
+                keyExtractor={(item, index) => index.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 style={styles.relatedServicesList}
@@ -143,6 +131,7 @@ const PlumbingService = () => {
     </View>
   );
 };
+
 
 // Styles for the component
 const styles = StyleSheet.create({
@@ -202,7 +191,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10,
-    marginTop: -50
+    marginTop: -50,
   },
   modalContent: {
     flex: 1,
@@ -244,7 +233,6 @@ const styles = StyleSheet.create({
   bookNowButton: {
     backgroundColor: 'purple',
   },
- 
   buttonText: {
     color: 'white',
     textAlign: 'center',

@@ -30,8 +30,8 @@ const HomeScreen = () => {
 
   const popularServicesData = [
     { id: '1', title: 'Floor Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
-    { id: '2', title: 'Room Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
-    { id: '3', title: 'Bathroom Cleaning', image: require('../assets/image/Slider1.png'), screen: 'Cleaning Service' },
+    { id: '2', title: 'Wall Painting', image: require('../assets/image/Slider1.png'), screen: 'Painting Service' },
+    { id: '3', title: 'Repairing', image: require('../assets/image/Slider1.png'), screen: 'Plumbing Service' },
   ];
 
   const categoriesData = [
@@ -91,7 +91,7 @@ const HomeScreen = () => {
   );
 
   return (
-    <ScrollView
+    <View
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
@@ -131,7 +131,7 @@ const HomeScreen = () => {
         showsHorizontalScrollIndicator={false}
         style={styles.popularSlider}
       />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
-    marginTop: 50,
+    marginTop: 10,
   },
   searchInput: {
     height: 40,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     marginTop:10,
   }),
   popularSlide: (viewportWidth) => ({
-    backgroundColor: 'lightgray',
+   
     borderRadius: 5,
     height: 200,
     width: viewportWidth * 0.75,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-    marginTop: 10,
+    marginTop: -1,
   },
 });
 
