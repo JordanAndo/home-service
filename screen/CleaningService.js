@@ -67,6 +67,7 @@ const CleaningService = () => {
       )}
     </TouchableOpacity>
   );
+  
 return (
     <View style={styles.container}>
       <FlatList

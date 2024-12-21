@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, FlatList, ToastAndroid, KeyboardAvoidingView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  FlatList,
+  ToastAndroid,
+  KeyboardAvoidingView,
+} from 'react-native';
 import CalendarPicker from 'react-native-calendar-picker';
 import { db, auth } from '../Firebase/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import moment from 'moment';
 
 export default function DateTimePickerScreen({ route, navigation }) {
-  const { selectedItem } = route.params;
+  const { selectedItem, onBookingAdded } = route.params || {}; // Handle missing params gracefully
   const [selectedDate, setSelectedDate] = useState(null);
   const [timeList, setTimeList] = useState([]);
-  const [selectedTime, setSelectedTime] = useState("");
-  const [note, setNote] = useState("");
+  const [selectedTime, setSelectedTime] = useState('');
+  const [note, setNote] = useState('');
 
+  // Generate time slots
   useEffect(() => {
     const timelist = [];
     for (let i = 8; i <= 12; i++) {
@@ -49,12 +60,15 @@ export default function DateTimePickerScreen({ route, navigation }) {
       await setDoc(doc(db, 'bookings', bookingId), bookingData);
       ToastAndroid.show('Booking confirmed successfully!', ToastAndroid.LONG);
 
-      // Add delay for navigation to ensure Firestore operation is completed
-      setTimeout(() => {
-        navigation.navigate('Home'); // Navigate after booking confirmation
-      }, 1000); // 1-second delay
+      // Trigger the callback to refresh bookings, if provided
+      if (onBookingAdded && typeof onBookingAdded === 'function') {
+        onBookingAdded();
+      }
+
+      // Navigate back to the BookingScreen
+      navigation.navigate('Home');
     } catch (error) {
-      console.error("Error saving booking: ", error);
+      console.error('Error saving booking: ', error);
       ToastAndroid.show('Error confirming booking. Please try again.', ToastAndroid.LONG);
     }
   };
@@ -65,7 +79,7 @@ export default function DateTimePickerScreen({ route, navigation }) {
         <Text style={[styles.header, { marginTop: -70 }]}>Select Date</Text>
         <View style={styles.calendarContainer}>
           <CalendarPicker
-            onDateChange={date => setSelectedDate(date)}
+            onDateChange={(date) => setSelectedDate(date)}
             width={300}
             minDate={new Date()}
             todayBackgroundColor="#FF6347"
@@ -81,12 +95,22 @@ export default function DateTimePickerScreen({ route, navigation }) {
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <TouchableOpacity style={{ marginLeft: 10 }} onPress={() => setSelectedTime(item.time)}>
-              <Text style={[selectedTime === item.time ? styles.selectedTime : styles.unselectedTime]}>
+            <TouchableOpacity
+              style={{ marginLeft: 10 }}
+              onPress={() => setSelectedTime(item.time)}
+            >
+              <Text
+                style={
+                  selectedTime === item.time
+                    ? styles.selectedTime
+                    : styles.unselectedTime
+                }
+              >
                 {item.time}
               </Text>
             </TouchableOpacity>
           )}
+          keyExtractor={(item) => item.time}
         />
 
         <Text style={[styles.header, { marginTop: 30 }]}>Suggestion</Text>

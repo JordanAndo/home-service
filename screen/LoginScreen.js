@@ -4,16 +4,18 @@ import { useRoute } from '@react-navigation/native';
 import { auth } from '../Firebase/firebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
 const db = getFirestore(); // Initialize Firestore
 
+const ADMIN_ID = "abjor555@gmail.com"; // Hardcoded admin ID
+
 const LoginScreen = () => {
-  const [username, setUsername] = useState(''); // New state for username
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState(''); // New state for phone number
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -23,12 +25,24 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
         const user = userCredential.user;
-        if (user.emailVerified) {
-          onLogin();
-        } else {
+
+        if (!user.emailVerified) {
           Alert.alert('Email not verified', 'Please verify your email before logging in.');
+          return;
+        }
+
+        // Check if the user is admin
+        if (email === ADMIN_ID) {
+          onLogin("admin"); // Navigate to AdminScreen
+        } else {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            onLogin("user"); // Navigate to HomeScreen
+          } else {
+            Alert.alert('Login Error', 'No account information found.');
+          }
         }
       })
       .catch((error) => {
@@ -45,30 +59,33 @@ const LoginScreen = () => {
       Alert.alert('Password Mismatch', 'Password and Confirm Password must be the same.');
       return;
     }
-    
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        
+
         // Save additional user info in Firestore
         setDoc(doc(db, 'users', user.uid), {
           username,
           phoneNumber,
         })
-        .then(() => {
-          sendEmailVerification(user)
-            .then(() => {
-              Alert.alert('Account Created', 'Your account was created successfully. Please verify your email.');
-              setIsNewUser(false);
-              clearFields();
-            })
-            .catch((error) => {
-              Alert.alert('Verification Error', error.message);
-            });
-        })
-        .catch((error) => {
-          Alert.alert('Database Error', error.message);
-        });
+          .then(() => {
+            sendEmailVerification(user)
+              .then(() => {
+                Alert.alert(
+                  'Account Created',
+                  'Your account was created successfully. Please verify your email.'
+                );
+                setIsNewUser(false);
+                clearFields();
+              })
+              .catch((error) => {
+                Alert.alert('Verification Error', error.message);
+              });
+          })
+          .catch((error) => {
+            Alert.alert('Database Error', error.message);
+          });
       })
       .catch((error) => {
         Alert.alert('Signup Error', error.message);
@@ -84,43 +101,40 @@ const LoginScreen = () => {
     setEmail('');
     setPassword('');
     setConfirmPassword('');
-    setUsername(''); // Clear username
-    setPhoneNumber(''); // Clear phone number
+    setUsername('');
+    setPhoneNumber('');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <Image 
-          source={require('../assets/image/image4.png')}
-          style={styles.serviceImage} 
-        />
+        <Image source={require('../assets/image/image4.png')} style={styles.serviceImage} />
         <View style={styles.content}>
           <Text style={styles.title}>{isNewUser ? 'Sign Up' : 'Login'}</Text>
 
-          <TextInput 
-            placeholder="Email" 
-            value={email} 
-            onChangeText={setEmail} 
-            style={styles.input} 
+          <TextInput
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
             keyboardType="email-address"
             autoCapitalize="none"
           />
 
           {isNewUser && (
             <>
-              <TextInput 
-                placeholder="Username" 
-                value={username} 
-                onChangeText={setUsername} 
-                style={styles.input} 
+              <TextInput
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+                style={styles.input}
               />
-              
-              <TextInput 
-                placeholder="Phone Number" 
-                value={phoneNumber} 
-                onChangeText={setPhoneNumber} 
-                style={styles.input} 
+
+              <TextInput
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                style={styles.input}
                 keyboardType="phone-pad"
                 autoCapitalize="none"
               />
@@ -128,49 +142,49 @@ const LoginScreen = () => {
           )}
 
           <View style={styles.passwordContainer}>
-            <TextInput 
-              placeholder="Password" 
-              value={password} 
-              onChangeText={setPassword} 
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
               secureTextEntry={!showPassword}
-              style={styles.passwordInput} 
+              style={styles.passwordInput}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons 
-                name={showPassword ? 'eye-off' : 'eye'} 
-                size={20} 
-                color="grey" 
-                style={styles.eyeIcon} 
+              <Ionicons
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="grey"
+                style={styles.eyeIcon}
               />
             </TouchableOpacity>
           </View>
 
           {isNewUser && (
             <View style={styles.passwordContainer}>
-              <TextInput 
-                placeholder="Confirm Password" 
-                value={confirmPassword} 
-                onChangeText={setConfirmPassword} 
+              <TextInput
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
-                style={styles.passwordInput} 
+                style={styles.passwordInput}
               />
               <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                <Ionicons 
-                  name={showConfirmPassword ? 'eye-off' : 'eye'} 
-                  size={20} 
-                  color="grey" 
-                  style={styles.eyeIcon} 
+                <Ionicons
+                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color="grey"
+                  style={styles.eyeIcon}
                 />
               </TouchableOpacity>
             </View>
           )}
-          
+
           {isNewUser ? (
             <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={[styles.loginButton,]} onPress={handleLogin}>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
           )}
@@ -178,8 +192,6 @@ const LoginScreen = () => {
           <Text style={styles.switchText} onPress={toggleUserMode}>
             {isNewUser ? 'Already have an account? Login' : 'Don’t have an account? Sign Up'}
           </Text>
-
-         
         </View>
       </View>
     </ScrollView>

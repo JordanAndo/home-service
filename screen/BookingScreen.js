@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 20,
     alignSelf: 'flex-end',
-  },
+  }, 
   paymentButtonText: {
     color: '#fff',
     fontSize: 14,

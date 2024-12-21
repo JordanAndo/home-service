@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": ""
+      "bundleIdentifier": "com.jordanando.homeservice"
     },
     "android": {
       "adaptiveIcon": {
